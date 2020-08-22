@@ -157,8 +157,9 @@ if __name__ == "__main__":
 
     # Write to file
     with open(MAPS_DIR + '/' + filename, 'w+') as file:
-        bytes_written = file.write(export_map(format='readable'))
-        print(bytes_written, 'bytes written')
+        file.write('{}\n'.format(width)) # map size
+        file.write(export_map(format='readable'))
+        print('File written.')
     
     # Debug
     # print('All locations:', set_blacklist)
