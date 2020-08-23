@@ -1,5 +1,5 @@
 #!/bin/env python3
-# Map generator
+# Map generator (standalone): utility for generating random maps
 
 from random import randrange
 import os
