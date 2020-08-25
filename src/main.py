@@ -25,4 +25,25 @@ if __name__ == "__main__":
         m = Map(f)
     
     print(m)
-    print(m._stats)
+    print('Stats :', m._stats)
+    print('Player:', m._player)
+    print('Reveal:', m.reveal())
+    print('Adjtls:', m.adjacents())
+    
+    # m.shoot()
+    # print()
+
+    # print(m)
+    # print('Stats :', m._stats)
+    # print('Player:', m._player)
+    # print('Reveal:', m.reveal())
+    # print('Adjtls:', m.adjacents())
+
+    # m.move()
+    # print()
+
+    # print(m)
+    # print('Stats :', m._stats)
+    # print('Player:', m._player)
+    # print('Reveal:', m.reveal())
+    # print('Adjtls:', m.adjacents())

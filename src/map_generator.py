@@ -6,8 +6,7 @@ import os
 
 # Parameters
 # No checks will be applied on parameters; please make sure it's sane.
-width        = 10
-height       = 10
+map_size     = 10
 # count_pit    = 1
 # count_wumpus = 1
 # count_gold   = 1
@@ -29,7 +28,7 @@ gold          = []
 player        = None
 
 # Subroutine: Generate a random location
-random_loc = lambda : (randrange(0, width), randrange(0, height))
+random_loc = lambda : (randrange(0, map_size), randrange(0, map_size))
 
 def adjacents(loc):
     """Get adjacents of a location.
@@ -37,9 +36,9 @@ def adjacents(loc):
     x, y = loc
     adjacent_list = []
     if (x-1 >= 0)       : adjacent_list.append((x-1, y))
-    if (x+1 <= width-1) : adjacent_list.append((x+1, y))
+    if (x+1 <= map_size-1) : adjacent_list.append((x+1, y))
     if (y-1 >= 0)       : adjacent_list.append((x, y-1))
-    if (y+1 <= width-1) : adjacent_list.append((x, y+1))
+    if (y+1 <= map_size-1) : adjacent_list.append((x, y+1))
     return adjacent_list
 
 def generate_map():
@@ -95,15 +94,15 @@ def export_map(format='readable'):
 
     #### Available formats:
     - `compact`: Conform to the format given in original problem statement.
-    - `readable`: The more human-readable version of `compact`, with even-width string per tiles
+    - `readable`: The more human-readable version of `compact`, with even-map_size string per tiles
     """
-    global width, height
+    global map_size, map_size
     global gold, pit, breeze, wumpus, stench
     map_2d_str = ''
 
     if format in ['compact', 'readable']:
         # Empty map
-        map_2d = [['' for _ in range(width)] for _ in range(height)]
+        map_2d = [['' for _ in range(map_size)] for _ in range(map_size)]
         
         # Add objects
         for each in gold:
@@ -127,13 +126,13 @@ def export_map(format='readable'):
         
         # If `readable` format: pad spaces
         if format == 'readable':
-            max_tile_width = max([
+            max_tile_map_size = max([
                 len(tile)
                 for each_row in map_2d
                 for tile in each_row
             ])
             map_2d = [
-                [tile.rjust(max_tile_width) for tile in each_row]
+                [tile.rjust(max_tile_map_size) for tile in each_row]
                 for each_row in map_2d
             ]
 
@@ -152,12 +151,12 @@ if __name__ == "__main__":
         len(gold), len(pit), len(wumpus)
     )
     print('Map = {} * {}\nPlayer = {}\nFilename = {}'.format(
-        width, height, player, filename
+        map_size, map_size, player, filename
     ))
 
     # Write to file
     with open(MAPS_DIR + '/' + filename, 'w+') as file:
-        file.write('{}\n'.format(width)) # map size
+        file.write('{}\n'.format(map_size)) # map size
         file.write(export_map(format='readable'))
         print('File written.')
     
