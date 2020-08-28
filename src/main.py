@@ -4,28 +4,34 @@
 import os
 from sys import argv
 
-from map import *
-import gui
+import controller
 
 # Working directory
 BASE_DIR   = os.path.dirname(os.path.realpath(__file__)) + '/..'
 MAPS_DIR   = BASE_DIR + '/maps'
+ASSETS_DIR = BASE_DIR + '/assets'
 
-# Defaults
-DEFAULT_MAP = MAPS_DIR + '/10G-10P-10W-base.txt'
-m           = Map()
+ONBOARDING_MSG = [
+# (Status)
+"""Wumpus World (2020-08-28)
+OPEN A MAP TO BEGIN.
+""",
 
-def map_open(mapfile):
-    global m
-    with open(mapfile, 'r') as f:
-        m = Map(f)
-    gui.map_receive(m)
+# (Log) keyboard shortcut hints
+"""
+Use the buttons on GUI, or press the following keys:
+[Z] Open  : open a mapfile
+[X] Reset : reset the game
+[C] Step  : advance current game by one step
+[V] Play  : toggle autostep mode
+
+How to read the status bar:
+MAP: (G)old, (W)umpus, (P)it count
+PLAYER: current location and orientation,
+        (a)rrows used, (s)core
+"""
+]
 
 if __name__ == "__main__":
-    map_open(DEFAULT_MAP)
-    
-    # test
-    gui.log.insert(gui.END, 'UI Prototype?')
-    gui.canvas_update()
-    gui.status_update()
-    gui.root.mainloop()
+    main_app = controller.Controller()
+    main_app.start()
