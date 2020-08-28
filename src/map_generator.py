@@ -7,9 +7,9 @@ import os
 # Parameters
 # No checks will be applied on parameters; please make sure it's sane.
 map_size     = 10
-# count_pit    = 1
-# count_wumpus = 1
-# count_gold   = 1
+# count_pit    = 10
+# count_wumpus = 10
+# count_gold   = 10
 count_pit    = randrange(0, 10+1)
 count_wumpus = randrange(1, 10+1)
 count_gold   = randrange(0, 10+1)
@@ -104,6 +104,10 @@ def export_map(format='readable'):
         # Empty map
         map_2d = [['' for _ in range(map_size)] for _ in range(map_size)]
         
+        # Add player
+        px, py = player
+        map_2d[py][px] = 'A'
+
         # Add objects
         for each in gold:
             map_2d[each[1]][each[0]] += 'G'

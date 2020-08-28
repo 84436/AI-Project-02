@@ -35,12 +35,23 @@ def check_map(file):
     file_lines = file.read().splitlines()
     map_size, map_lines = int(file_lines[0]), file_lines[1:]
 
-    # Sanity check
+    # Sanity check: is the map consistent?
     for each_line in map_lines:
         if len(each_line) < map_size:
             print('Inconsistent map size. Aborting.')
-            return
+            exit(-1)
     
+    # Sanity check: does player exist in map?
+    player_exists = False
+    for y, a in enumerate(map_lines):
+        for x, b in enumerate(a):
+            if 'A' in b:
+                player_exists = True
+                break
+    if not player_exists:
+        print('Player (Agent/A) does not exist in map. Aborting.')
+        exit(-1)
+
     # Split
     map_2d = [
         list(map(str.strip, each_line.split('.')))
@@ -65,9 +76,19 @@ def check_map(file):
                     map_2d[y][x] = map_2d[y][x].replace('P', '')
                 b = map_2d[y][x] # ugly hack
             if 'P' in b:                
-                for a in adjacents((x, y)): map_2d[a[1]][a[0]] += 'B'
+                for a in adjacents((x, y)):
+                    if all(
+                        item not in map_2d[a[1]][a[0]]
+                        for item in 'BPW'
+                    ):
+                        map_2d[a[1]][a[0]] += 'B'
             if 'W' in b:
-                for a in adjacents((x, y)): map_2d[a[1]][a[0]] += 'S'
+                for a in adjacents((x, y)):
+                    if all(
+                        item not in map_2d[a[1]][a[0]]
+                        for item in 'SPW'
+                    ):
+                        map_2d[a[1]][a[0]] += 'S'
     
     # Serialize
     max_tile_width = max([

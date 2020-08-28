@@ -2,6 +2,7 @@
 # Map provider
 
 from random import randrange
+from copy import deepcopy
 
 class Map:
     """Map provider.
@@ -9,18 +10,17 @@ class Map:
     """
     
     def __init__(self, mapfile=None):
-        # Map
-        self._map = None
+        # Golden copy (for reset)
+        self.__golden_copy = None
 
-        # Map stats
+        # Map and Player
+        self._map = None
         self._stats = {
             'mapsize': None,
             'count_gold': 0,
             'count_pit': 0,
             'count_wumpus': 0
         }
-
-        # Player stats
         self._player = {
             'loc': None,
             'orient': 'R',
@@ -28,7 +28,7 @@ class Map:
             'score': 0,
         }
 
-        # Scoring rules for player's actions
+        # Scoring rules for player's actions (hardcoded)
         self.__score_table = {
             'MOVE': -10,
             'ARROW': -100,
@@ -62,7 +62,24 @@ class Map:
             for each_line in self._map
         ])
         return r
-    
+
+    def reset(self):
+        """Reset current map
+        """
+        if self.__golden_copy is not None:
+            self._map = deepcopy(self.__golden_copy['map'])
+            self._stats = deepcopy(self.__golden_copy['map_stats'])
+            self._player = deepcopy(self.__golden_copy['player_stats'])
+
+    def __copy(self):
+        """`INTERNAL` Make a deep copy of current map states
+        """
+        self.__golden_copy = {
+            'map': deepcopy(self._map),
+            'map_stats': deepcopy(self._stats),
+            'player_stats': deepcopy(self._player)
+        }
+
     def __inmap(self, loc):
         """`INTERNAL` Check if a location is within boundaries.
         """
@@ -71,6 +88,18 @@ class Map:
             for c in loc
         ])
     
+    def __adjacents(self, loc):
+        """`INTERNAL` Get adjacents of a location.
+        """
+        x, y = loc
+        size = self._stats['mapsize']
+        adjacent_list = []
+        if (x-1 >= 0)      : adjacent_list.append((x-1, y))
+        if (x+1 <= size-1) : adjacent_list.append((x+1, y))
+        if (y-1 >= 0)      : adjacent_list.append((x, y-1))
+        if (y+1 <= size-1) : adjacent_list.append((x, y+1))
+        return adjacent_list
+
     def __update_score(self, event):
         """`INTERNAL` Update player's score
         """
@@ -89,10 +118,6 @@ class Map:
             list(map(str.strip, each_line.split('.')))
             for each_line in map_lines
         ]
-        for each_line in map_lines:
-            if len(each_line) < self._stats['mapsize']:
-                print('WARNING: inconsistent map')
-                break
 
         # Populate stats
         for each_line in map_lines:
@@ -100,30 +125,24 @@ class Map:
                 if 'G' in each_tile: self._stats['count_gold'] += 1
                 if 'P' in each_tile: self._stats['count_pit'] += 1
                 if 'W' in each_tile: self._stats['count_wumpus'] += 1
-
-        # Choose a random place as player init
-        random_loc = lambda : (
-            randrange(0, self._stats['mapsize']),
-            randrange(0, self._stats['mapsize'])
-        )
-        px, py = self._player['loc'] = random_loc()
         
-        # Reassign player's location until clear of obstacles
-        while any(
-            items in self._map[py][px]
-            for items in 'PW'
-        ) or any(
-            items in self._map[ty][tx]
-            for items in 'PW'
-            for ty, tx in self.adjacents()
-        ):
-            px, py = self._player['loc'] = random_loc()
+        # Read player's init and remove it from map
+        for y, a in enumerate(self._map):
+            for x, b in enumerate(a):
+                if 'A' in b:
+                    self._player['loc'] = (x, y)
+                    self._map[y][x] = self._map[y][x].replace('A', '')
+                    break
         
         # Cover all tiles except player's init
-        for x, a in enumerate(self._map):
-            for y, b in enumerate(a):
+        px, py = self._player['loc']
+        for y, a in enumerate(self._map):
+            for x, b in enumerate(a):
                 self._map[y][x] += 'X'
         self._map[py][px] = self._map[py][px].replace('X', '')
+
+        # Make a golden copy (in case of reset)
+        self.__copy()
     
     def reveal(self):
         """Reveal what's on the current tile
@@ -142,16 +161,9 @@ class Map:
         pass
     
     def adjacents(self):
-        """Get adjacents of a location.
+        """Get adjacents of player's current location.
         """
-        x, y = self._player['loc']
-        size = self._stats['mapsize']
-        adjacent_list = []
-        if (x-1 >= 0)      : adjacent_list.append((x-1, y))
-        if (x+1 <= size-1) : adjacent_list.append((x+1, y))
-        if (y-1 >= 0)      : adjacent_list.append((x, y-1))
-        if (y+1 <= size-1) : adjacent_list.append((x, y+1))
-        return adjacent_list
+        return self.__adjacents(self._player['loc'])
     
     def orient(self, new_loc):
         """Change player's orientation according to the new location.
@@ -183,17 +195,14 @@ class Map:
             nx, ny = target_tile
             
             if 'W' in self._map[ny][nx]:
-                # WORKAROUND: temporarily move the player to where wumpus was,
-                # remove all the stench, then move back to the old location.
-                # THIS NO GOOD CODE
-
                 # remove stench from wumpus surrounding
-                self._player['loc'] = target_tile
-                for each in self.adjacents():
-                    ex, ey = each
-                    if 'S' in self._map[ey][ex]:
+                # if there's more than one wumpus sharing a stench, keep it
+                for each in self.__adjacents(target_tile):
+                    adjacents_of_each = self.__adjacents(each)
+                    adjacents_of_each.remove(target_tile)
+                    if all('W' not in self._map[eey][eex] for eex, eey in adjacents_of_each):
+                        ex, ey = each
                         self._map[ey][ex] = self._map[ey][ex].replace('S', '')
-                self._player['loc'] = (x, y)
                 
                 # remove wumpus itself
                 self._map[ny][nx] = self._map[ny][nx].replace('W', '')
