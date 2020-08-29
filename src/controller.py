@@ -51,7 +51,7 @@ class Controller():
         else:
             self.map.orient(move)
             self.map.move()
-            self.gui.log_write('MOVE: {}'.format(self.loc_invert_helper(move)))
+            self.gui.log_write('MOVE: {}, SENSE: {}'.format(self.loc_invert_helper(move), self.map.reveal()))
         
         # Game over check, player dead
         if any(x in self.map.reveal() for x in 'PW'):
