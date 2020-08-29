@@ -6,6 +6,7 @@ import os
 
 # Parameters
 # No checks will be applied on parameters; please make sure it's sane.
+
 map_size     = 10
 # count_pit    = 10
 # count_wumpus = 10
@@ -13,6 +14,12 @@ map_size     = 10
 count_pit    = randrange(0, 10+1)
 count_wumpus = randrange(1, 10+1)
 count_gold   = randrange(0, 10+1)
+
+# Map format: see docs for export_map()
+gen_format   = 'readable'
+# gen_format   = 'compact'
+
+####################
 
 # Working directory
 BASE_DIR   = os.path.dirname(os.path.realpath(__file__)) + '/..'
@@ -136,7 +143,7 @@ def export_map(format='readable'):
                 for tile in each_row
             ])
             map_2d = [
-                [tile.rjust(max_tile_map_size) for tile in each_row]
+                [tile.rjust(max_tile_map_size, '-') for tile in each_row]
                 for each_row in map_2d
             ]
 
@@ -145,6 +152,8 @@ def export_map(format='readable'):
             map_2d_str += '.'.join(each_line) + '\n'
 
     return map_2d_str
+
+##########
 
 if __name__ == "__main__":
     # Generate map
@@ -161,7 +170,7 @@ if __name__ == "__main__":
     # Write to file
     with open(MAPS_DIR + '/' + filename, 'w+') as file:
         file.write('{}\n'.format(map_size)) # map size
-        file.write(export_map(format='readable'))
+        file.write(export_map(format=gen_format))
         print('File written.')
     
     # Debug

@@ -156,7 +156,9 @@ class WumpusGUI():
         self.log['state'] = DISABLED
     
     def log_clear(self):
+        self.log['state'] = NORMAL
         self.log.delete(1.0, END)
+        self.log['state'] = DISABLED
 
     ####################
 

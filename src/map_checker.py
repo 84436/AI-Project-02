@@ -5,13 +5,17 @@
 from sys import argv
 import os
 
-# Working directory
-BASE_DIR   = os.path.dirname(os.path.realpath(__file__)) + '/..'
-MAPS_DIR   = BASE_DIR + '/maps'
+# Parameters
 
 # In case of both pit and wumpus in a tile, choose which one to be kept
 # True = wumpus will be removed
 PRIORITIZE_PITS = True
+
+##########
+
+# Working directory
+BASE_DIR   = os.path.dirname(os.path.realpath(__file__)) + '/..'
+MAPS_DIR   = BASE_DIR + '/maps'
 
 # Storage
 map_size = None
@@ -97,13 +101,15 @@ def check_map(file):
         for tile in each_row
     ])
     map_2d = [
-        [tile.rjust(max_tile_width) for tile in each_row]
+        [tile.rjust(max_tile_width, '-') for tile in each_row]
         for each_row in map_2d
     ]
     map_2d_str = ''
     for each_line in map_2d:
         map_2d_str += '.'.join(each_line) + '\n'
     return map_2d_str
+
+##########
 
 if __name__ == "__main__":
     if len(argv) != 2:

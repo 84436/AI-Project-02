@@ -115,8 +115,9 @@ class Map:
         self._stats['mapsize'], map_lines = int(file_lines[0]), file_lines[1:]
 
         # Sanity check
+        strip_hyphen = lambda string: string.strip('-')
         self._map = [
-            list(map(str.strip, each_line.split('.')))
+            list(map(strip_hyphen, each_line.split('.')))
             for each_line in map_lines
         ]
 
@@ -147,12 +148,15 @@ class Map:
 
         # Make a golden copy (in case of reset)
         self.__copy()
+    
     def location(self):
         """Return location of related location"""
         return self._player['loc']
+    
     def init_location(self):
         """Return init location"""
         return self._player['loc_init'] 
+    
     def reveal(self):
         """Reveal what's on the current tile
         """

@@ -1,11 +1,11 @@
 10
- B. P. P. P. P. P. P. P. P. P
-  . B. B. B. B. B. B. B. B. P
- B. P. P. P. P. P. P. P. B. P
- B. P. B. B. B. B. B. P. B. P
- B. P. B. P. P. P. B. P. B. P
- B. P. B. P.GB. B. B. P. B. P
- B. P. B. P. P. P. P. P. B. P
- B. P. B. B. B. B. B. B. B. P
- B. P. P. P. P. P. P. P. P. P
-  . B. B. B. B. B. B. B. B.AB
+-B.-P.-P.-P.-P.-P.-P.-P.-P.-P
+--.-B.-B.-B.-B.-B.-B.-B.-B.-P
+-B.-P.-P.-P.-P.-P.-P.-P.-B.-P
+-B.-P.-B.-B.-B.-B.-B.-P.-B.-P
+-B.-P.-B.-P.-P.-P.-B.-P.-B.-P
+-B.-P.-B.-P.GB.-B.-B.-P.-B.-P
+-B.-P.-B.-P.-P.-P.-P.-P.-B.-P
+-B.-P.-B.-B.-B.-B.-B.-B.-B.-P
+-B.-P.-P.-P.-P.-P.-P.-P.-P.-P
+--.-B.-B.-B.-B.-B.-B.-B.-B.AB
