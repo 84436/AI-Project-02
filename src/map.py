@@ -203,10 +203,14 @@ class Map:
                 for each in self.__adjacents(target_tile):
                     adjacents_of_each = self.__adjacents(each)
                     adjacents_of_each.remove(target_tile)
+                    ex, ey = each
                     if all('W' not in self._map[eey][eex] for eex, eey in adjacents_of_each):
-                        ex, ey = each
                         self._map[ey][ex] = self._map[ey][ex].replace('S', '')
-                
+                    # breeze
+                    if 'P' in self._map[ey][ex]:
+                        self._map[ny][nx] += 'B'
+                        break
+
                 # remove wumpus itself
                 self._map[ny][nx] = self._map[ny][nx].replace('W', '')
                 
