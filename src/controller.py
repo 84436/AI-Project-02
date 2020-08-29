@@ -41,24 +41,30 @@ class Controller():
         # Player: make a move
         move = self.player.make_move(self.map)
 
+        # Player: pick up gold
         if move == 'gold':
             self.map.get_gold()
             self.gui.log_write('GOLD: Picked up')
+
+        # Player: shoot
         elif move[0] == 'shoot':
             self.map.orient(move[1])
             self.map.shoot()
             self.gui.log_write('SHOOT: {}'.format(self.loc_invert_helper(move[1])))
+        
+        # Player: move
         else:
             self.map.orient(move)
             self.map.move()
             self.gui.log_write('MOVE: {}, SENSE: {}'.format(self.loc_invert_helper(move), self.map.reveal()))
-        
+
         # Game over check, player dead
         if any(x in self.map.reveal() for x in 'PW'):
             self.gui.log_write('Player dead')
             self.gui.game_over()
         
         # Game over check, player survived (out of wumpus and gold)
-        if all(item == 0 for item in [self.map._stats['count_gold'], self.map._stats['count_wumpus']]):
+        if all(item == 0 for item in [self.map._stats['count_gold'], self.map._stats['count_wumpus']]) or move == 'leave':
+            self.map.leave()
             self.gui.log_write('Player survived.')
             self.gui.game_over()

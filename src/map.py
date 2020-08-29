@@ -244,3 +244,9 @@ class Map:
             self.__update_score('MOVE')
             x, y = self._player['loc']
             self._map[y][x] = self._map[y][x].replace('X', '')
+
+    def leave(self):
+        """Leave the cave.
+        """
+        self.__update_score('CAVE_OUT')
+    
