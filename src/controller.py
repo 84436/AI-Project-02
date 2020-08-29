@@ -41,8 +41,14 @@ class Controller():
         # Player: make a move
         move = self.player.make_move(self.map)
 
+        # Player: leave
+        if move == 'leave':
+            self.map.leave()
+            self.gui.log_write('Player left the cave.')
+            self.gui.game_over()
+        
         # Player: pick up gold
-        if move == 'gold':
+        elif move == 'gold':
             self.map.get_gold()
             self.gui.log_write('GOLD: Picked up')
 
@@ -64,7 +70,6 @@ class Controller():
             self.gui.game_over()
         
         # Game over check, player survived (out of wumpus and gold)
-        if all(item == 0 for item in [self.map._stats['count_gold'], self.map._stats['count_wumpus']]) or move == 'leave':
-            self.map.leave()
+        if all(item == 0 for item in [self.map._stats['count_gold'], self.map._stats['count_wumpus']]):
             self.gui.log_write('Player survived.')
             self.gui.game_over()
