@@ -1,5 +1,5 @@
 #!/bin/env python3
-# Dummy logic
+# True logic
 
 from random import choice, shuffle
 from pysat.solvers import Glucose3
@@ -132,7 +132,6 @@ class SupperInteligentPlayer():
 
     def is_safe(self, node):
         entailed = self.entail()
-        # print("Safety check:", node, entailed)
         return self.convert_wumpus(node) not in entailed and self.convert_pit(node) not in entailed
 
     def entail(self):
@@ -159,8 +158,6 @@ class SupperInteligentPlayer():
         if self.__shoot_queue:
             self._clauses.append(
                 [-1*self._wumpus_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
-            # self._viewed_vision[self.__shoot_queue[-1][1]
-            #                     [0]][self.__shoot_queue[-1][1][1]] = True
             if 'W' in map_object._map[self.__shoot_queue[-1][1][1]][self.__shoot_queue[-1][1][0]]:
                 while [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]] in self._clauses:
                     self._clauses.remove(
@@ -173,10 +170,9 @@ class SupperInteligentPlayer():
         location = map_object.location()
         self._viewed_vision[location[0]][location[1]] = True
         print(self.get_neighbor())
-        # print('#', map_object._map)
         adjacents = map_object.adjacents()
 
-        # Gold
+
 
         # Pit
         if 'B' in current:
@@ -224,6 +220,7 @@ class SupperInteligentPlayer():
                 while [self._wumpus_mat[each[0]][each[1]]] in self._clauses:
                     self._clauses.remove([self._wumpus_mat[each[0]][each[1]]])
                 self._clauses.append([-1*self._wumpus_mat[each[0]][each[1]]])
+        # Gold
         if 'G' in current:
             return 'gold'
         self._move_count += 1
@@ -278,5 +275,4 @@ class SupperInteligentPlayer():
             return ('leave')
         if next_move == -1:
             return init_location
-
         return next_move
