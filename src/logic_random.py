@@ -37,7 +37,7 @@ class RandomPlayer():
 
 class SupperInteligentPlayer():
     _viewed_vision = [[False]*10 for _ in range(10)]
-
+    
     def __init__(self):
         self._model = Glucose3()
         self.__shoot_queue = []
@@ -54,8 +54,6 @@ class SupperInteligentPlayer():
         self._viewed_vision = [[False]*10 for _ in range(10)]
         self._model = Glucose3()
         self._move_count = 0
-
-
 
     def get_neighbor(self):
         neighbor_list = []
@@ -74,6 +72,7 @@ class SupperInteligentPlayer():
                 if is_valid(x, y) and (x, y) not in neighbor_list and (x, y) not in vision:
                     neighbor_list.append((x, y))
         return neighbor_list
+
     def get_viewed(self):
         vision = []
         for i in range(10):
@@ -81,9 +80,11 @@ class SupperInteligentPlayer():
                 if (self._viewed_vision[i][j]):
                     vision.append((i, j))
         return vision
+
     def expand_safezone(self, expanded):
         expanding = set(expanded.copy())
         dist = [[-1]*10 for _ in range(10)]
+
         def is_valid(_x, _y):
             return _x in range(10) and _y in range(10)
         neigbor = self.get_neighbor()
@@ -94,7 +95,7 @@ class SupperInteligentPlayer():
             for dx, dy in zip([0, 0, 1, -1], [1, -1, 0, 0]):
                 x = cell[0] + dx
                 y = cell[1] + dy
-                if (x,y) in vision:
+                if (x, y) in vision:
                     expanding.add((x, y))
         return expanding
 
@@ -110,25 +111,28 @@ class SupperInteligentPlayer():
             return _x in range(10) and _y in range(10)
         while q:
             topx, topy = q.popleft()
-            if (topx,topy) == _end:
+            if (topx, topy) == _end:
                 break
             for dx, dy in zip([0, 0, 1, -1], [1, -1, 0, 0]):
                 x = topx + dx
                 y = topy + dy
-                if is_valid(x,y) and not visited[x][y] and self.is_safe((x,y)):
+                if is_valid(x, y) and not visited[x][y] and self.is_safe((x, y)):
                     visited[x][y] = True
-                    q.append((x,y))
-                    path[x][y] = (topx,topy)
-        def path_get(_start,_end):
+                    q.append((x, y))
+                    path[x][y] = (topx, topy)
+
+        def path_get(_start, _end):
             pre = path[_end[0]][_end[1]]
             while(pre != -1 and path[pre[0]][pre[1]] != _start):
                 pre = path[pre[0]][pre[1]]
             return pre
-        return path_get(_start,_end)
-    def is_safe(self,node):
+        return path_get(_start, _end)
+
+    def is_safe(self, node):
         entailed = self.entail()
-        print("Safety check:", node,entailed)
+        print("Safety check:", node, entailed)
         return self.convert_wumpus(node) not in entailed and self.convert_pit(node) not in entailed
+
     def entail(self):
         self._model = Glucose3()
         if self._clauses:
@@ -152,8 +156,15 @@ class SupperInteligentPlayer():
         # If action queue is still there
         if self.__shoot_queue:
             self._clauses.append(
-                            [-1*self._wumpus_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
-            self._viewed_vision[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]] = True
+                [-1*self._wumpus_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
+            self._viewed_vision[self.__shoot_queue[-1][1]
+                                [0]][self.__shoot_queue[-1][1][1]] = True
+            if 'W' in map_object._map[self.__shoot_queue[-1][1][1]][self.__shoot_queue[-1][1][0]]:
+                while [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]] in self._clauses:
+                    self._clauses.remove(
+                        [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
+                self._clauses.append(
+                    [-1*self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
             return self.__shoot_queue.pop()
 
         current = map_object.reveal()
@@ -165,7 +176,6 @@ class SupperInteligentPlayer():
 
         # Gold
 
-        
         # Pit
         if 'B' in current:
             if self._move_count == 0:
@@ -197,8 +207,15 @@ class SupperInteligentPlayer():
                         can_shoot -= 1
                 if self.__shoot_queue:
                     self._clauses.append(
-                            [-1*self._wumpus_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
-                    self._viewed_vision[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]] = True
+                        [-1*self._wumpus_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
+                    # self._viewed_vision[self.__shoot_queue[-1][1]
+                    # [0]][self.__shoot_queue[-1][1][1]] = True
+                    if 'W' in map_object._map[self.__shoot_queue[-1][1][1]][self.__shoot_queue[-1][1][0]]:
+                        while [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]] in self._clauses:
+                            self._clauses.remove(
+                                [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
+                        self._clauses.append(
+                            [-1*self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
                     return self.__shoot_queue.pop()
         else:
             for each in adjacents:
@@ -216,7 +233,7 @@ class SupperInteligentPlayer():
                 if self.convert_wumpus(node) not in entailed and self.convert_pit(node) not in entailed:
                     safety_node.append(node)
         # If no other options
-        print("[+S] ", safety_node,len(entailed))
+        print("[+S] ", safety_node, len(entailed))
         shuffle(adjacents)
         posible_move = set()
         for move in adjacents:
@@ -243,12 +260,12 @@ class SupperInteligentPlayer():
 
             for move in posible_move:
                 if not self._viewed_vision[move[0]][move[1]]:
-                    next_move = self.optimal_path(location,move)
-                    print("[A] Target ",next_move)
+                    next_move = self.optimal_path(location, move)
+                    print("[A] Target ", next_move)
                     if next_move != -1:
                         print("[A] Move out of adj ", next_move)
                         is_moved = True
                         return next_move
 
         print("[L] Go to cave")
-        return None 
+        return None
