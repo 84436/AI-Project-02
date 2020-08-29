@@ -143,7 +143,10 @@ class Map:
 
         # Make a golden copy (in case of reset)
         self.__copy()
-    
+    def location(self):
+        """Return location of related location"""
+        return self._player['loc']
+
     def reveal(self):
         """Reveal what's on the current tile
         """

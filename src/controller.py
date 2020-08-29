@@ -8,7 +8,7 @@ from logic_random import *
 class Controller():
     def __init__(self):
         self.map = Map()
-        self.player = RandomPlayer()
+        self.player = SupperInteligentPlayer()
         self.gui = WumpusGUI(
             {
                 'map_get': self.cb_map_get,
