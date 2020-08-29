@@ -23,6 +23,7 @@ class Map:
         }
         self._player = {
             'loc': None,
+            'loc_init': None,
             'orient': 'R',
             'arrow': 0,
             'score': 0,
@@ -134,6 +135,9 @@ class Map:
                     self._map[y][x] = self._map[y][x].replace('A', '')
                     break
         
+        # Mark player's init (cave exit)
+        self._player['loc_init'] = self._player['loc']
+
         # Cover all tiles except player's init
         px, py = self._player['loc']
         for y, a in enumerate(self._map):
@@ -249,5 +253,6 @@ class Map:
     def leave(self):
         """Leave the cave.
         """
-        self.__update_score('CAVE_OUT')
+        if self._player['loc'] == self._player['loc_init']:
+            self.__update_score('CAVE_OUT')
     

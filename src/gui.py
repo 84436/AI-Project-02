@@ -110,7 +110,7 @@ class WumpusGUI():
 
     def status_update(self):
         _, cgold, cpit, cwumpus       = self.ext_map_get()._stats.values()
-        ploc, porient, parrow, pscore = self.ext_map_get()._player.values()
+        ploc, _, porient, parrow, pscore = self.ext_map_get()._player.values()
         self.status.delete(1.0, END)
         self.status.insert(END, 'MAP    : '  , 'text-bold')
         self.status.insert(END, '{}G {}P {}W'.format(cgold, cpit, cwumpus))
