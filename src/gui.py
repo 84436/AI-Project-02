@@ -75,8 +75,8 @@ class WumpusGUI():
         # Text views
         self.status_font = Font          (family=FONT, size=12)
         self.log_font    = Font          (family=FONT, size=11)
-        self.status      = Text          (font=self.status_font,  background='#f0f0f0', foreground='#000000', relief=FLAT)
-        self.log         = ScrolledText  (font=self.log_font,     background='#f0f0f0', foreground='#000000', relief=FLAT)
+        self.status      = Text          (font=self.status_font,  background='#f0f0f0', foreground='#000000', relief=FLAT, state=DISABLED)
+        self.log         = ScrolledText  (font=self.log_font,     background='#f0f0f0', foreground='#000000', relief=FLAT, state=DISABLED)
         self.status.tag_configure        ('text-bold', font='-family {} -weight bold'.format(FONT))
 
         # Layout
@@ -111,12 +111,14 @@ class WumpusGUI():
     def status_update(self):
         _, cgold, cpit, cwumpus       = self.ext_map_get()._stats.values()
         ploc, _, porient, parrow, pscore = self.ext_map_get()._player.values()
+        self.status['state'] = NORMAL
         self.status.delete(1.0, END)
         self.status.insert(END, 'MAP    : '  , 'text-bold')
         self.status.insert(END, '{}G {}P {}W'.format(cgold, cpit, cwumpus))
         self.status.insert(END, '\n'         )
         self.status.insert(END, 'PLAYER : '  , 'text-bold')
         self.status.insert(END, '{} {} a={} s={}'.format(self.invert_loc(ploc), porient, parrow, pscore))
+        self.status['state'] = DISABLED
 
     def canvas_update(self):
         self.canvas.delete('all')
@@ -148,8 +150,10 @@ class WumpusGUI():
         elif po == 'R': self.canvas.create_image(TILE_SIZE*px, TILE_SIZE*py, anchor=NW, image=self.objects['player_right'])
 
     def log_write(self, msg):
+        self.log['state'] = NORMAL
         self.log.insert(END, msg + '\n')
         self.log.see(END)
+        self.log['state'] = DISABLED
     
     def log_clear(self):
         self.log.delete(1.0, END)

@@ -53,13 +53,13 @@ class Controller():
             self.gui.log_write('GOLD: Picked up')
 
         # Player: shoot
-        elif move[0] == 'shoot':
+        elif type(move) == tuple and move[0] == 'shoot':
             self.map.orient(move[1])
             self.map.shoot()
             self.gui.log_write('SHOOT: {}'.format(self.loc_invert_helper(move[1])))
         
         # Player: move
-        else:
+        elif type(move) == tuple:
             self.map.orient(move)
             self.map.move()
             self.gui.log_write('MOVE: {}, SENSE: {}'.format(self.loc_invert_helper(move), self.map.reveal()))
