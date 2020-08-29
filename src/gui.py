@@ -231,6 +231,8 @@ class WumpusGUI():
         self.__game_over = True
         self.game_pause()
         self.__autostep_job_cancel_id = None
+        self.status_update()
+        self.canvas_update()
 
         # Disable buttons and keys
         self.button_step['state'] = DISABLED

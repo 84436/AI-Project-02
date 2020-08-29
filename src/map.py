@@ -150,7 +150,9 @@ class Map:
     def location(self):
         """Return location of related location"""
         return self._player['loc']
-
+    def init_location(self):
+        """Return init location"""
+        return self._player['loc_init'] 
     def reveal(self):
         """Reveal what's on the current tile
         """

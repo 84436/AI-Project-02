@@ -37,7 +37,7 @@ class RandomPlayer():
 
 class SupperInteligentPlayer():
     _viewed_vision = [[False]*10 for _ in range(10)]
-    
+
     def __init__(self):
         self._model = Glucose3()
         self.__shoot_queue = []
@@ -47,6 +47,7 @@ class SupperInteligentPlayer():
                          for j in range(0, 10)]
         self._clauses = []
         self._move_count = 0
+        self.is_giving_up = False
 
     def reset(self):
         self.__shoot_queue.clear()
@@ -54,6 +55,7 @@ class SupperInteligentPlayer():
         self._viewed_vision = [[False]*10 for _ in range(10)]
         self._model = Glucose3()
         self._move_count = 0
+        self.is_giving_up = False
 
     def get_neighbor(self):
         neighbor_list = []
@@ -130,7 +132,7 @@ class SupperInteligentPlayer():
 
     def is_safe(self, node):
         entailed = self.entail()
-        print("Safety check:", node, entailed)
+        # print("Safety check:", node, entailed)
         return self.convert_wumpus(node) not in entailed and self.convert_pit(node) not in entailed
 
     def entail(self):
@@ -182,7 +184,7 @@ class SupperInteligentPlayer():
                 print("[L] Go to cave")
 
                 # Climb out
-                pass
+                return 'leave'
             clause = []
             arc = 0
             for each in adjacents:
@@ -232,40 +234,49 @@ class SupperInteligentPlayer():
             for node in self.get_neighbor():
                 if self.convert_wumpus(node) not in entailed and self.convert_pit(node) not in entailed:
                     safety_node.append(node)
-        # If no other options
-        print("[+S] ", safety_node, len(entailed))
-        shuffle(adjacents)
-        posible_move = set()
-        for move in adjacents:
-            if move in safety_node:
-                posible_move.add(move)
-
-        for move in posible_move:
-            if not self._viewed_vision[move[0]][move[1]]:
-                print("[A] move safety", move)
-                return move
-
-        is_moved = False
-        expand = set(adjacents.copy())
-        pre = set()
-        while not is_moved:
-            pre = expand
-            expand = self.expand_safezone(expand)
-
-            if sorted(pre) == sorted(expand):
-                break
-            for move in expand:
+        if self.is_giving_up == False:
+            # If no other options
+            print("[+S] ", safety_node, len(entailed))
+            shuffle(adjacents)
+            posible_move = set()
+            for move in adjacents:
                 if move in safety_node:
                     posible_move.add(move)
 
             for move in posible_move:
                 if not self._viewed_vision[move[0]][move[1]]:
-                    next_move = self.optimal_path(location, move)
-                    print("[A] Target ", next_move)
-                    if next_move != -1:
-                        print("[A] Move out of adj ", next_move)
-                        is_moved = True
-                        return next_move
+                    print("[A] move safety", move)
+                    return move
 
+            is_moved = False
+            expand = set(adjacents.copy())
+            pre = set()
+            while not is_moved:
+                pre = expand
+                expand = self.expand_safezone(expand)
+
+                if sorted(pre) == sorted(expand):
+                    break
+                for move in expand:
+                    if move in safety_node:
+                        posible_move.add(move)
+
+                for move in posible_move:
+                    if not self._viewed_vision[move[0]][move[1]]:
+                        next_move = self.optimal_path(location, move)
+                        print("[A] Target ", next_move)
+                        if next_move != -1:
+                            print("[A] Move out of adj ", next_move)
+                            is_moved = True
+                            return next_move
+        self.is_giving_up = True
+        init_location = map_object.init_location()
         print("[L] Go to cave")
-        return None
+        print("$: ", init_location, location)
+        next_move = self.optimal_path(location, init_location)
+        if location == init_location:
+            return ('leave')
+        if next_move == -1:
+            return init_location
+
+        return next_move
