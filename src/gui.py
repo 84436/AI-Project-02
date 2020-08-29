@@ -2,47 +2,36 @@
 # GUI using Tkinter
 # NOTE: IT'S A CALLBACK MESS (?)
 
+from os import path
+
 from tkinter import *
 from tkinter.filedialog import *
 from tkinter.scrolledtext import *
 from tkinter.font import *
 from tkinter.ttk import *
 
-from os import path
-from main import BASE_DIR, MAPS_DIR, ONBOARDING_MSG
-
-# Asset theme/set
-ASSETS_THEME = 'thiagodnf'
-ASSETS_DIR = BASE_DIR + '/assets/' + ASSETS_THEME
+from main import BASE_DIR, ASSETS_DIR, MAPS_DIR
+from main import WINDOW_TITLE, WINDOW_UNIT, FONT, ONBOARDING_MSG
+from main import TILE_SIZE, TILES_SHOW_HIDDEN
+from main import KEYB_OPEN, KEYB_RESET, KEYB_STEP, KEYB_AUTOSTEP, AUTOSTEP_DELAY
 
 class WumpusGUI():
     """Wumpus GUI instance, powered by Tk/Ttk.
     """
 
     def __init__(self, callback_dict, loc_invert_helper):
-        """All inits go here (for now.)
+        """All inits go here.
         """
-
-        # Constants
-        self.TILE_SIZE      = 64
-        self.WINDOW_UNIT    = 16
-        self.WINDOW_TITLE   = 'Wumpus World'
-        self.FONT           = 'Consolas'
-        self.AUTOSTEP_DELAY = 100 # ms
-        self.KEYB_OPEN      = 'z'
-        self.KEYB_RESET     = 'x'
-        self.KEYB_STEP      = 'c'
-        self.KEYB_AUTOSTEP  = 'v'
 
         # Root window
         self.root = Tk()
-        self.root.title(self.WINDOW_TITLE)
-        self.root.geometry('{}x{}'.format(3*self.WINDOW_UNIT + 17*self.TILE_SIZE, 6*self.WINDOW_UNIT + 10*self.TILE_SIZE))
+        self.root.title(WINDOW_TITLE)
+        self.root.geometry('{}x{}'.format(3*WINDOW_UNIT + 17*TILE_SIZE, 6*WINDOW_UNIT + 10*TILE_SIZE))
         self.root.resizable(0, 0)
         self.root.configure(background='#ffffff')
 
         # Buttons
-        Style().configure('TButton', font=self.FONT, background='#ffffff')
+        Style().configure('TButton', font=FONT, background='#ffffff')
         self.button_open  = Button(text='@ OPEN' , command=self.map_open_dialog)
         self.button_reset = Button(text='* RESET', command=self.game_reset)
         self.button_step  = Button(text='> STEP' , command=self.game_step)
@@ -53,10 +42,10 @@ class WumpusGUI():
         # that is not really needed here. A lambda is thus used
         # to ignore that event.
         # https://codereview.stackexchange.com/a/193357
-        self.root.bind(self.KEYB_OPEN,      lambda event: self.map_open_dialog())
-        self.root.bind(self.KEYB_RESET,     lambda event: self.game_reset())
-        self.root.bind(self.KEYB_STEP,      lambda event: self.game_step())
-        self.root.bind(self.KEYB_AUTOSTEP,  lambda event: self.game_play())
+        self.root.bind(KEYB_OPEN,      lambda event: self.map_open_dialog())
+        self.root.bind(KEYB_RESET,     lambda event: self.game_reset())
+        self.root.bind(KEYB_STEP,      lambda event: self.game_step())
+        self.root.bind(KEYB_AUTOSTEP,  lambda event: self.game_play())
 
         # Buttons: External callbacks
         self.ext_map_get  = callback_dict['map_get']
@@ -73,29 +62,31 @@ class WumpusGUI():
             'wumpus'        : PhotoImage(file=ASSETS_DIR + '/wumpus.png'),
             'breeze'        : PhotoImage(file=ASSETS_DIR + '/breeze.png'),
             'stench'        : PhotoImage(file=ASSETS_DIR + '/stench.png'),
-            'tile'          : PhotoImage(file=ASSETS_DIR + '/tile.png'),
-            'tile_hidden'   : PhotoImage(file=ASSETS_DIR + '/tile_hidden_alpha80.png'),
             'player_up'     : PhotoImage(file=ASSETS_DIR + '/player_up.png'),
             'player_down'   : PhotoImage(file=ASSETS_DIR + '/player_down.png'),
             'player_left'   : PhotoImage(file=ASSETS_DIR + '/player_left.png'),
             'player_right'  : PhotoImage(file=ASSETS_DIR + '/player_right.png'),
+            'tile'          : PhotoImage(file=ASSETS_DIR + '/tile.png'),
+            'tile_hidden'   :      PhotoImage(file=ASSETS_DIR + '/tile_hidden_alpha80.png')
+                                if TILES_SHOW_HIDDEN
+                              else PhotoImage(file=ASSETS_DIR + '/tile_hidden.png'),
         }
 
         # Text views
-        self.status_font = Font          (family=self.FONT, size=12)
-        self.log_font    = Font          (family=self.FONT, size=11)
+        self.status_font = Font          (family=FONT, size=12)
+        self.log_font    = Font          (family=FONT, size=11)
         self.status      = Text          (font=self.status_font,  background='#f0f0f0', foreground='#000000', relief=FLAT)
         self.log         = ScrolledText  (font=self.log_font,     background='#f0f0f0', foreground='#000000', relief=FLAT)
-        self.status.tag_configure        ('text-bold', font='-family {} -weight bold'.format(self.FONT))
+        self.status.tag_configure        ('text-bold', font='-family {} -weight bold'.format(FONT))
 
         # Layout
-        self.button_open     .place(x=(1 + 0*9.25)*self.WINDOW_UNIT, y=16, width=9.25*self.WINDOW_UNIT, height=3*self.WINDOW_UNIT)
-        self.button_reset    .place(x=(2 + 1*9.25)*self.WINDOW_UNIT, y=16, width=9.25*self.WINDOW_UNIT, height=3*self.WINDOW_UNIT)
-        self.button_step     .place(x=(3 + 2*9.25)*self.WINDOW_UNIT, y=16, width=9.25*self.WINDOW_UNIT, height=3*self.WINDOW_UNIT)
-        self.button_play     .place(x=(4 + 3*9.25)*self.WINDOW_UNIT, y=16, width=9.25*self.WINDOW_UNIT, height=3*self.WINDOW_UNIT)
-        self.canvas          .place(x=1*self.WINDOW_UNIT, y=5*self.WINDOW_UNIT, width=10*self.TILE_SIZE, height=10*self.TILE_SIZE)
-        self.status          .place(x=2*self.WINDOW_UNIT + 10*self.TILE_SIZE, y=1*self.WINDOW_UNIT, width=7*self.TILE_SIZE, height=3*self.WINDOW_UNIT)
-        self.log             .place(x=2*self.WINDOW_UNIT + 10*self.TILE_SIZE, y=5*self.WINDOW_UNIT, width=7*self.TILE_SIZE, height=10*self.TILE_SIZE)
+        self.button_open     .place(x=(1 + 0*9.25)*WINDOW_UNIT, y=16, width=9.25*WINDOW_UNIT, height=3*WINDOW_UNIT)
+        self.button_reset    .place(x=(2 + 1*9.25)*WINDOW_UNIT, y=16, width=9.25*WINDOW_UNIT, height=3*WINDOW_UNIT)
+        self.button_step     .place(x=(3 + 2*9.25)*WINDOW_UNIT, y=16, width=9.25*WINDOW_UNIT, height=3*WINDOW_UNIT)
+        self.button_play     .place(x=(4 + 3*9.25)*WINDOW_UNIT, y=16, width=9.25*WINDOW_UNIT, height=3*WINDOW_UNIT)
+        self.canvas          .place(x=1*WINDOW_UNIT, y=5*WINDOW_UNIT, width=10*TILE_SIZE, height=10*TILE_SIZE)
+        self.status          .place(x=2*WINDOW_UNIT + 10*TILE_SIZE, y=1*WINDOW_UNIT, width=7*TILE_SIZE, height=3*WINDOW_UNIT)
+        self.log             .place(x=2*WINDOW_UNIT + 10*TILE_SIZE, y=5*WINDOW_UNIT, width=7*TILE_SIZE, height=10*TILE_SIZE)
         
         # Autostep / Game over
         self.__autostep_job_cancel_id = None
@@ -106,9 +97,9 @@ class WumpusGUI():
 
     def __onboarding(self):
         # Disable buttons and keys
-        self.root.bind(self.KEYB_RESET, lambda event: None)
-        self.root.bind(self.KEYB_STEP, lambda event: None)
-        self.root.bind(self.KEYB_AUTOSTEP, lambda event: None)
+        self.root.bind(KEYB_RESET, lambda event: None)
+        self.root.bind(KEYB_STEP, lambda event: None)
+        self.root.bind(KEYB_AUTOSTEP, lambda event: None)
         self.button_reset['state'] = DISABLED
         self.button_step['state'] = DISABLED
         self.button_play['state'] = DISABLED
@@ -132,29 +123,29 @@ class WumpusGUI():
         for y, each_line in enumerate(self.ext_map_get()._map):
             for x, each_tile in enumerate(each_line):
                 # Draw tile first
-                self.canvas.create_image(self.TILE_SIZE*x, self.TILE_SIZE*y, anchor=NW, image=self.objects['tile'])
+                self.canvas.create_image(TILE_SIZE*x, TILE_SIZE*y, anchor=NW, image=self.objects['tile'])
 
                 # Bad stuff for player:
                 if any(item in each_tile for item in 'PW'):
-                    if 'P' in each_tile: self.canvas.create_image(self.TILE_SIZE*x, self.TILE_SIZE*y, anchor=NW, image=self.objects['pit'])
-                    if 'W' in each_tile: self.canvas.create_image(self.TILE_SIZE*x, self.TILE_SIZE*y, anchor=NW, image=self.objects['wumpus'])
+                    if 'P' in each_tile: self.canvas.create_image(TILE_SIZE*x, TILE_SIZE*y, anchor=NW, image=self.objects['pit'])
+                    if 'W' in each_tile: self.canvas.create_image(TILE_SIZE*x, TILE_SIZE*y, anchor=NW, image=self.objects['wumpus'])
 
                 # Good stuff for player?
                 elif any(item in each_tile for item in 'GBS'):
-                    if 'G' in each_tile:   self.canvas.create_image(self.TILE_SIZE*x, self.TILE_SIZE*y, anchor=NW, image=self.objects['gold'])
-                    if 'B' in each_tile:   self.canvas.create_image(self.TILE_SIZE*x, self.TILE_SIZE*y, anchor=NW, image=self.objects['breeze'])
-                    if 'S' in each_tile:   self.canvas.create_image(self.TILE_SIZE*x, self.TILE_SIZE*y, anchor=NW, image=self.objects['stench'])
+                    if 'G' in each_tile:   self.canvas.create_image(TILE_SIZE*x, TILE_SIZE*y, anchor=NW, image=self.objects['gold'])
+                    if 'B' in each_tile:   self.canvas.create_image(TILE_SIZE*x, TILE_SIZE*y, anchor=NW, image=self.objects['breeze'])
+                    if 'S' in each_tile:   self.canvas.create_image(TILE_SIZE*x, TILE_SIZE*y, anchor=NW, image=self.objects['stench'])
                 
                 # Hide the tile if not discovered
                 if 'X' in each_tile:
-                    self.canvas.create_image(self.TILE_SIZE*x, self.TILE_SIZE*y, anchor=NW, image=self.objects['tile_hidden'])
+                    self.canvas.create_image(TILE_SIZE*x, TILE_SIZE*y, anchor=NW, image=self.objects['tile_hidden'])
 
         # Player    
         (px, py), po = self.ext_map_get()._player['loc'], self.ext_map_get()._player['orient']
-        if po == 'U':   self.canvas.create_image(self.TILE_SIZE*px, self.TILE_SIZE*py, anchor=NW, image=self.objects['player_up'])
-        elif po == 'D': self.canvas.create_image(self.TILE_SIZE*px, self.TILE_SIZE*py, anchor=NW, image=self.objects['player_down'])
-        elif po == 'L': self.canvas.create_image(self.TILE_SIZE*px, self.TILE_SIZE*py, anchor=NW, image=self.objects['player_left'])
-        elif po == 'R': self.canvas.create_image(self.TILE_SIZE*px, self.TILE_SIZE*py, anchor=NW, image=self.objects['player_right'])
+        if po == 'U':   self.canvas.create_image(TILE_SIZE*px, TILE_SIZE*py, anchor=NW, image=self.objects['player_up'])
+        elif po == 'D': self.canvas.create_image(TILE_SIZE*px, TILE_SIZE*py, anchor=NW, image=self.objects['player_down'])
+        elif po == 'L': self.canvas.create_image(TILE_SIZE*px, TILE_SIZE*py, anchor=NW, image=self.objects['player_left'])
+        elif po == 'R': self.canvas.create_image(TILE_SIZE*px, TILE_SIZE*py, anchor=NW, image=self.objects['player_right'])
 
     def log_write(self, msg):
         self.log.insert(END, msg + '\n')
@@ -193,9 +184,9 @@ class WumpusGUI():
         self.button_reset['state'] = NORMAL
         self.button_step['state'] = NORMAL
         self.button_play['state'] = NORMAL
-        self.root.bind(self.KEYB_RESET, lambda event: self.game_reset())
-        self.root.bind(self.KEYB_STEP, lambda event: self.game_step())
-        self.root.bind(self.KEYB_AUTOSTEP, lambda event: self.game_play())
+        self.root.bind(KEYB_RESET, lambda event: self.game_reset())
+        self.root.bind(KEYB_STEP, lambda event: self.game_step())
+        self.root.bind(KEYB_AUTOSTEP, lambda event: self.game_play())
 
         # Update and log
         self.status_update()
@@ -210,16 +201,16 @@ class WumpusGUI():
     def game_autostep(self):
         self.game_step()
         if not self.__game_over:
-            self.__autostep_job_cancel_id = self.root.after(self.AUTOSTEP_DELAY, self.game_autostep)
+            self.__autostep_job_cancel_id = self.root.after(AUTOSTEP_DELAY, self.game_autostep)
 
     def game_play(self):
         # Log
-        self.log_write('Autostep started with delay of {}ms'.format(self.AUTOSTEP_DELAY))
+        self.log_write('Autostep started with delay of {}ms'.format(AUTOSTEP_DELAY))
 
         # Rebind buttons and keys
         self.button_play['text'] = '|| PAUSE'
         self.button_play['command'] = self.game_pause
-        self.root.bind(self.KEYB_AUTOSTEP, lambda event: self.game_pause())
+        self.root.bind(KEYB_AUTOSTEP, lambda event: self.game_pause())
 
         # Start autostep
         self.game_autostep()
@@ -233,7 +224,7 @@ class WumpusGUI():
         # Rebind buttons and keys
         self.button_play['text'] = '>> PLAY'
         self.button_play['command'] = self.game_play
-        self.root.bind(self.KEYB_AUTOSTEP, lambda event: self.game_play())
+        self.root.bind(KEYB_AUTOSTEP, lambda event: self.game_play())
 
     def game_over(self):
         # Raise the flag (to stahp it)
@@ -244,5 +235,5 @@ class WumpusGUI():
         # Disable buttons and keys
         self.button_step['state'] = DISABLED
         self.button_play['state'] = DISABLED
-        self.root.bind(self.KEYB_STEP, lambda event: None)
-        self.root.bind(self.KEYB_AUTOSTEP, lambda event: None)
+        self.root.bind(KEYB_STEP, lambda event: None)
+        self.root.bind(KEYB_AUTOSTEP, lambda event: None)
