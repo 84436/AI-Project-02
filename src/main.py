@@ -3,7 +3,7 @@
 
 # Configurables
 ASSETS_THEME      = 'thiagodnf'
-TILES_SHOW_HIDDEN = True
+TILES_SHOW_HIDDEN = False
 WINDOW_TITLE      = 'Wumpus World'
 FONT              = 'Consolas'
 AUTOSTEP_DELAY    = 100 # ms

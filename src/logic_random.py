@@ -157,8 +157,8 @@ class SupperInteligentPlayer():
         if self.__shoot_queue:
             self._clauses.append(
                 [-1*self._wumpus_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
-            self._viewed_vision[self.__shoot_queue[-1][1]
-                                [0]][self.__shoot_queue[-1][1][1]] = True
+            # self._viewed_vision[self.__shoot_queue[-1][1]
+            #                     [0]][self.__shoot_queue[-1][1][1]] = True
             if 'W' in map_object._map[self.__shoot_queue[-1][1][1]][self.__shoot_queue[-1][1][0]]:
                 while [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]] in self._clauses:
                     self._clauses.remove(

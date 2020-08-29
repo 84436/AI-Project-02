@@ -209,7 +209,8 @@ class Map:
                     # breeze
                     if 'P' in self._map[ey][ex]:
                         self._map[ny][nx] += 'B'
-                        continue
+                    if 'W' in self._map[ey][ex]:
+                        self._map[ny][nx] += 'S'
 
                 # remove wumpus itself
                 self._map[ny][nx] = self._map[ny][nx].replace('W', '')
