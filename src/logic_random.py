@@ -154,19 +154,24 @@ class SupperInteligentPlayer():
         return self._pit_mat[x][y]
 
     def make_move(self, map_object):
+        current = map_object.reveal()
+
         # If action queue is still there
         if self.__shoot_queue:
-            self._clauses.append(
-                [-1*self._wumpus_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
-            if 'W' in map_object._map[self.__shoot_queue[-1][1][1]][self.__shoot_queue[-1][1][0]]:
-                while [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]] in self._clauses:
-                    self._clauses.remove(
-                        [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
+            if 'S' in current and not self._viewed_vision[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]:
                 self._clauses.append(
-                    [-1*self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
-            return self.__shoot_queue.pop()
+                    [-1*self._wumpus_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
+                if 'W' in map_object._map[self.__shoot_queue[-1][1][1]][self.__shoot_queue[-1][1][0]]:
+                    while [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]] in self._clauses:
+                        self._clauses.remove(
+                            [self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
+                    self._clauses.append(
+                        [-1*self._pit_mat[self.__shoot_queue[-1][1][0]][self.__shoot_queue[-1][1][1]]])
+                return self.__shoot_queue.pop()
+            else:
+                while self.__shoot_queue:
+                    self.__shoot_queue.pop()
 
-        current = map_object.reveal()
         location = map_object.location()
         self._viewed_vision[location[0]][location[1]] = True
         print(self.get_neighbor())
