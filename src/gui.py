@@ -105,7 +105,9 @@ class WumpusGUI():
         self.button_play['state'] = DISABLED
 
         # Write messages
+        self.status['state'] = NORMAL
         self.status.insert(END, ONBOARDING_MSG[0], 'text-bold')
+        self.status['state'] = DISABLED
         self.log_write(ONBOARDING_MSG[1])
 
     def status_update(self):

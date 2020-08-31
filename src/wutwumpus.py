@@ -1,6 +1,7 @@
 #!/bin/env python3
 # WutWumpus: You don't want to play this.
 # Not (Won't?) implemented: death check (i.e. the player is invisible by default), "game over" state
+# This is not meant to be serious. (Seriously.)
 
 from functools import partial
 from tkinter import *

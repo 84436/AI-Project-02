@@ -1,0 +1,24 @@
+/* https://support.typora.io/HTML/#inline-html */
+@page {
+    size: A4;
+}
+
+/* https://github.com/typora/typora-issues/issues/1519 */
+@media print {
+    html {
+        font-size: 14px!important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    body.typora-export {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .typora-export #write {
+        padding: 0 !important;
+        margin-top: 1mm !important;
+        margin-right: 1mm !important;
+        margin-bottom: 1mm !important;
+        margin-left: 1mm !important;
+    }
+}
